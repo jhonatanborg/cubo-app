@@ -31,7 +31,7 @@
                     <v-text-field
                       solo
                       placeholder="Ex: (66) 99999-9999"
-                      id="tel"
+                      
                       name="tel"
                       type="number"
                       v-model="phone"
@@ -98,11 +98,11 @@
                   </div>
                   <div class>
                     <label>CNPJ</label>
-                    <v-text-field v-model="cnpj" solo placeholder="000 000 000 0000/1" id="tel" />
+                    <v-text-field v-model="cnpj" solo placeholder="000 000 000 0000/1"  />
                   </div>
                   <div class>
                     <label>Telefone</label>
-                    <v-text-field v-model="phone" solo placeholder="Ex: (66) 99999-9999" id="tel" />
+                    <v-text-field v-model="phone" solo placeholder="Ex: (66) 99999-9999"  />
                   </div>
                   <div class>
                     <label>Endereço comercial completo</label>
@@ -122,7 +122,7 @@
                       </div>
                     </div>
                     <div class="col w-20">
-                      <label>Numero</label>
+                      <label>Número</label>
                       <div id="bloodhound">
                         <v-text-field v-model="number" solo id="number" aria-describedby="helpId" />
                       </div>
@@ -132,13 +132,7 @@
                     <label for>CEP</label>
                     <v-text-field v-model="cep" solo id="cep" name="cep" />
                   </div>
-                  <v-btn
-                    class="mt-5"
-                    @click="registerCompany()"
-                    type="submit"
-                    color="primary"
-                    block
-                  >Confirmar</v-btn>
+                  <v-btn class="mt-5" @click="registerCompany()" color="primary" block>Confirmar</v-btn>
                 </div>
               </div>
             </div>
@@ -152,7 +146,7 @@
 <script>
 
 import vars from '../plugins/env.local'
-const url = `${vars.host}companyController.php`
+const url = `${vars.host}clientController.php`
 
 export default {
   mounted: function () {
@@ -176,18 +170,57 @@ export default {
   }),
   methods: {
     resgisterClient() {
-      let type = "fisica"
-      console.log(this.client)
-      console.log(this.cpf)
-      console.log(this.phone)
-      console.log(this.address)
-      console.log(this.district)
-      console.log(this.number)
-      console.log(this.cep)
-      console.log(type)
+      // let type = "fisica"
+      // console.log(this.client)
+      // console.log(this.cpf)
+      // console.log(this.phone)
+      // console.log(this.address)
+      // console.log(this.district)
+      // console.log(this.number)
+      // console.log(this.cep)
+      // console.log(type)
+     let form = new FormData()
+      form.append('register-client', 'true')
+      form.append('street', this.address)
+      form.append('district', this.district)
+      form.append('number', this.number)
+      form.append('cep', this.cep)
+      form.append('name', this.client)
+      form.append('doc', this.cpf)
+      form.append('tel', this.phone)
+      form.append('type', 'Fisíca')
+      fetch(url, {
+        method: 'POST',
+        body: form
+      }).then(resp => {
+        return resp.json()
+      }).then(json => {
+        console.log(json)
+      })
+
 
     },
     registerCompany() {
+      let form = new FormData()
+      form.append('register-client', 'true')
+      form.append('street', this.address)
+      form.append('district', this.district)
+      form.append('number', this.number)
+      form.append('cep', this.cep)
+      form.append('name', this.companyname)
+      form.append('doc', this.cnpj)
+      form.append('tel', this.phone)
+      form.append('type', 'Jurídica')
+      fetch(url, {
+        method: 'POST',
+        body: form
+      }).then(resp => {
+        return resp.json()
+      }).then(json => {
+        console.log(json)
+      })
+
+
       let type = "juridica"
       console.log(this.companyname)
       console.log(this.cnpj)
@@ -197,6 +230,7 @@ export default {
       console.log(this.number)
       console.log(this.cep)
       console.log(type)
+
 
     }
   }

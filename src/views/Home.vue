@@ -18,33 +18,41 @@
         <v-app-bar-nav-icon class="text-white" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       </v-app-bar>
       <v-app class="pt-5 mt-3 bg-app">
-       mt-1
+        mt-1
         <v-sheet>
           <v-container class="py-5">
             <!-- <v-text-field label="Buscar" v-model="search" outlined></v-text-field> -->
             <h5 class="border-bottom border-warning pb-2 w-50">Parcelas</h5>
-            <div
-              v-for="installment in searchBussines "
-              :key="installment.id"
-              class="text-decoration-none"
-            >
-              <router-link
-                v-bind:to="'/parcelreceive/'+ installment.id"
-                class="text-decoration-none"
-              >
-                <v-card class="card mb-2 p-2">
-                  <div class="d-flex justify-content-between">
-                    <span class="text-primary">
-                      <b>{{installment.company.name}}</b>
-                    </span>
-                    <div :class="installment.status">
-                      <span class="personal badge badge-pill">{{installment.status}}</span>
-                    </div>
-                  </div>
-                </v-card>
-              </router-link>
+            <div>
+              <v-list>
+                <v-list-item-group
+                  v-for="installment in searchBussines "
+                  :key="installment.id"
+                  class="text-decoration-none"
+                >
+                  <v-list-item
+                    tag="router-link"
+                    v-bind:to="'/parcelreceive/'+ installment.id"
+                    class="text-decoration-none"
+                    color="amber"
+                  >
+                    <v-list-item-content>
+                      <v-list-item-title>{{installment.client[0].name}}</v-list-item-title>
+                      <v-list-item-subtitle>13-05-2018</v-list-item-subtitle>
+                    </v-list-item-content>
+                    <v-list-item-action>
+                      <div :class="installment.status">
+                        <span class="personal badge badge-pill">{{installment.status}}</span>
+                      </div>
+                    </v-list-item-action>
+                  </v-list-item>
+                </v-list-item-group>
+              </v-list>
+                <!-- <div id="resp">
+                  aqui
+                </div> -->
+
             </div>
-          
           </v-container>
         </v-sheet>
         <v-dialog
@@ -276,6 +284,8 @@ export default {
     this.verifyBox()
     this.getBoxValues()
     this.levelVerify()
+    this.unsuccessful()
+
   },
   updated: function () {
     this.verifyBox()
@@ -301,6 +311,7 @@ export default {
     outputs: 0,
     valueDay: 0,
     totalValue: 0,
+    
     items: [{
       title: 'Home',
       icon: 'mdi-view-dashboard',
@@ -312,7 +323,7 @@ export default {
     }, {
       title: 'Clientes',
       icon: 'mdi-account-multiple',
-      router: '/companies'
+      router: '/clients'
     }, {
       title: 'Entrada',
       icon: 'mdi-code-greater-than',
@@ -336,7 +347,14 @@ export default {
       title: 'Contratos',
       icon: 'mdi-account-box-outline',
       router: '/listcontracts'
-    },],
+    },
+     {
+      title: 'Relátorio',
+      icon: 'mdi-clipboard-outline',
+      router: '/report'
+    },
+    
+    ],
     components: [],
     installments: [],
     a: true,
@@ -371,9 +389,21 @@ export default {
       }).then(resp => {
         return resp.json()
       }).then(json => {
-        this.installments = json
-        // console.log(location)
         // document.getElementById('resp').innerHTML = json
+        this.installments = json
+        console.log(json)
+      })
+    },
+     unsuccessful() {
+      const url = `${vars.host}parcelController.php`
+      let formData = new FormData()
+      formData.append('unsuccessful', 'true')
+      fetch(url, {
+        method: 'POST',
+        body: formData
+      }).then(resp => {
+        return resp.json()
+      }).then(json => {
         console.log(json)
       })
     },
@@ -517,6 +547,10 @@ export default {
 }
 
 .COBRADO .personal {
+  color: #fff;
+  background-color: #8747ff;
+}
+.VENCIDA .personal {
   color: #fff;
   background-color: #ff4747;
 }

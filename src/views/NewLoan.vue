@@ -11,32 +11,26 @@
       </router-link>
     </v-toolbar>
     <v-divider></v-divider>mt-1
-    <v-container class="bg-app">
-      <div class="container p-1 pt-2 bg-app">
-        <div class="form-group">
-          <!-- <v-text-field label="Buscar" outlined></v-text-field> -->
-        </div>
-        <h5 class="border-bottom border-warning pb-2 w-50">Empresas</h5>
-        <div class="template-demo">
-          <div
-            v-for="company in companies"
-            :id="company.id"
-            v-on:click="redirect(company.id)"
-            :key="company.id"
-            class=""
-          >
-            <v-card class="card-n rounded mb-2 p-2">
-              <div class="media d-flex align-items-center">
-                <div class="media-body">
-                  <h6 class="mb-1 font-weight-bold text-primary">{{company.name}}</h6>
-                  <p class="mb-0 text-muted">{{company.owner.name}}</p>
-                </div>
-              </div>
-            </v-card>
-          </div>
-        </div>
-      </div>
-    </v-container>
+    <div class="container pt-4 bg-app">
+      <h5 class="border-bottom border-warning pb-2 w-50">Clientes</h5>
+    </div>
+    <v-list>
+      <v-list-item-group color="amber">
+        <v-list-item
+          v-for="client in clients"
+          :id="client.id"
+          v-on:click="redirect(client.id)"
+          :key="client.id"
+          class
+        >
+          <v-list-item-content>
+            <v-list-item-title>{{client.name}}</v-list-item-title>
+            <v-list-item-subtitle>{{client.doc}}</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-item-group>
+      <v-divider></v-divider>
+    </v-list>
   </div>
 </template>
 <script>
@@ -51,14 +45,14 @@ export default {
   },
   data: () => ({
     components: [],
-    companies: []
+    clients: []
   }),
   methods: {
     listAllCompanies() {
-      this.comp
-      const url = `${vars.host}companyController.php`
+      
+      const url = `${vars.host}clientController.php`
       let formData = new FormData()
-      formData.append('all-companies', 'true')
+      formData.append('all-clients', 'true')
       fetch(url, {
         method: 'POST',
         body: formData
@@ -66,18 +60,18 @@ export default {
         return resp.json()
       }).then(json => {
         json.forEach(item => {
-          this.companies.push(item)
+          this.clients.push(item)
         })
-        console.log(this.companies)
+        console.log(this.clients)
       })
     },
     redirect(id) {
       // e.preventDefault()
-      localStorage.setItem('company-id', id)
+      localStorage.setItem('client-id', id)
       if (id) {
         this.$router.push('plans')
       }
-      console.log(localStorage.getItem('company-id'))
+      console.log(localStorage.getItem('client-id'))
     }
   }
 }

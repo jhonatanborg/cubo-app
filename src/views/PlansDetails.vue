@@ -20,7 +20,7 @@
         </h5>
         <h5 class="text-muted">Responsável</h5>
         <h5 class="text-primary">
-          <b>{{owner.name}}</b>
+          <b>{{dados.tel}}</b>
         </h5>
       </v-card>
       <div class="card mb-1 p-2 mt-2 bg-primary">
@@ -183,7 +183,6 @@ export default {
     },],
     plan: '',
     dados: '',
-    owner: '',
     sheets: '',
     dialog: false,
   }),
@@ -224,11 +223,11 @@ export default {
       })
     },
     getData() {
-      if (localStorage.getItem('company-id')) {
-        const url = `${vars.host}companyController.php`
+      if (localStorage.getItem('client-id')) {
+        const url = `${vars.host}clientController.php`
         let formData = new FormData()
-        formData.append('this-company', 'true')
-        formData.append('company-id', localStorage.getItem('company-id'))
+        formData.append('this-client', 'true')
+        formData.append('client-id', localStorage.getItem('client-id'))
         fetch(url, {
           method: 'POST',
           body: formData
@@ -237,7 +236,6 @@ export default {
         }).then(json => {
           console.log(json);
           this.dados = json[0]
-          this.owner = json[0].owner
         })
       } else {
         this.$router.push('newloan')

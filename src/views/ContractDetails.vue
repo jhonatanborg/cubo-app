@@ -14,11 +14,11 @@
         <v-card class="p-2">
           <h5 class="text-muted">Empresa</h5>
           <h5 class="text-primary">
-            <b>{{item.company.name}}</b>
+            <b>{{item.client.name}}</b>
           </h5>
           <h5 class="text-muted">Responsável</h5>
           <h5 class="text-primary">
-            <b>{{item.company.owner_id.name}}</b>
+            <b>{{item.client.name}}</b>
           </h5>
         </v-card>
         <div class="card mb-1 p-2 mt-2" :class="background">
@@ -56,7 +56,7 @@
               <div class="container">
                 <h4>
                   Cancelar contrado de
-                  <b>{{item.company.name}}</b>
+                  <b>{{item.client.name}}</b>
                 </h4>
               </div>
               <v-btn block color="red" class="mt-5" @click="CancelView = false">Não</v-btn>

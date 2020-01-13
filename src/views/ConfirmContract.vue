@@ -18,7 +18,7 @@
           </h5>
           <h5 class="text-muted">Responsável</h5>
           <h5 class="text-primary">
-            <b>{{owner.name}}</b>
+            <b>{{dados.tel}}</b>
           </h5>
         </v-card>
         <v-divider></v-divider>
@@ -76,9 +76,9 @@
       <v-dialog persistent v-model="success" max-width="300px">
         <v-card class="container">
           <div class="text-center">
-            <v-icon class='display-4' color="primary">mdi-checkbox-marked-circle-outline</v-icon>
+            <v-icon class="display-4" color="primary">mdi-checkbox-marked-circle-outline</v-icon>
           </div>
-          <h5 class="text-center mt-5 ">Contrato gerado com Sucesso</h5>
+          <h5 class="text-center mt-5">Contrato gerado com Sucesso</h5>
           <v-btn block color="primary" @click="save()">Concluído</v-btn>
         </v-card>
       </v-dialog>
@@ -121,7 +121,7 @@ export default {
     },],
     plan: '',
     dados: '',
-    owner: '',
+
     success: '',
   }),
   methods: {
@@ -192,11 +192,11 @@ export default {
       })
     },
     getData() {
-      if (localStorage.getItem('company-id')) {
-        const url = `${vars.host}companyController.php`
+      if (localStorage.getItem('client-id')) {
+        const url = `${vars.host}clientController.php`
         let formData = new FormData()
-        formData.append('this-company', 'true')
-        formData.append('company-id', localStorage.getItem('company-id'))
+        formData.append('this-client', 'true')
+        formData.append('client-id', localStorage.getItem('client-id'))
         fetch(url, {
           method: 'POST',
           body: formData
@@ -204,7 +204,6 @@ export default {
           return resp.json()
         }).then(json => {
           this.dados = json[0]
-          this.owner = json[0].owner
         })
       } else {
         this.$router.push('newloan')
@@ -217,7 +216,7 @@ export default {
       let json = JSON.stringify(this.installments)
       form.append('parcelas', json)
       form.append('plan-id', localStorage.getItem('plan-id'))
-      form.append('company-id', localStorage.getItem('company-id'))
+      form.append('client-id', localStorage.getItem('client-id'))
       form.append('user-id', localStorage.getItem('user-id'))
       fetch(url, {
         method: 'POST',

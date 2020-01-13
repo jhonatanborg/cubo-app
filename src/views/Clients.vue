@@ -11,18 +11,25 @@
     <v-spacer class="mt-5"></v-spacer>
     <div class="container">
       <h5 class="border-bottom border-warning pb-2 w-50">Lista de clientes</h5>
-      <div v-for="company in companies" :key="company.id">
-        <v-card tag="router-link" :to="'/companyedit/' + company.id" class="card-n rounded mb-2">
-          <div class="card-body p-2">
-            <div class="media d-flex align-items-center">
-              <div class="media-body">
-                <h6 class="mb-1 font-weight-bold text-primary">{{company.name}}</h6>
-                <p class="mb-0 text-muted">{{company.owner.name}}</p>
-              </div>
-            </div>
-          </div>
-        </v-card>
-      </div>
+       <v-list>
+      <v-list-item-group  color="amber">
+        <v-list-item
+          v-for="client in clients"
+          :id="client.id"
+          v-on:click="redirect(client.id)"
+          :key="client.id"
+          class
+
+          tag="router-link" :to="'/clientedit/' + client.id"
+        >
+          <v-list-item-content>
+            <v-list-item-title>{{client.name}}</v-list-item-title>
+            <v-list-item-subtitle>{{client.doc}}</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-item-group>
+      <v-divider></v-divider>
+    </v-list>
     </div>
   </div>
 </template>
@@ -38,13 +45,13 @@ export default {
   },
   data: () => ({
     components: [],
-    companies: []
+    clients: []
   }),
   methods: {
     listAllCompanies() {
-      const url = `${vars.host}companyController.php`
+      const url = `${vars.host}clientController.php`
       let formData = new FormData()
-      formData.append('all-companies', 'true')
+      formData.append('all-clients', 'true')
       fetch(url, {
         method: 'POST',
         body: formData
@@ -52,9 +59,9 @@ export default {
         return resp.json()
       }).then(json => {
         json.forEach(item => {
-          this.companies.push(item)
+          this.clients.push(item)
         })
-        console.log(this.companies)
+        console.log(this.clients)
       })
     },
 

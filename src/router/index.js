@@ -31,9 +31,9 @@ const routes = [
     component: () => import('../views/NewCompany.vue')
   },
   {
-    path: '/companies',
-    name: 'companies',
-    component: () => import('../views/Companies.vue')
+    path: '/clients',
+    name: 'clients',
+    component: () => import('../views/Clients.vue')
   },
   {
     path: '/newloan',
@@ -117,9 +117,9 @@ const routes = [
   component: () => import('../views/ContractDetails.vue')
 },
 {
-  path: '/companyedit/:id',
-  name: 'companyedit',
-  component: () => import('../views/CompanyEdit.vue')
+  path: '/clientedit/:id',
+  name: 'clientedit',
+  component: () => import('../views/ClientEdit.vue')
 },
 {
   path: '/registerclient',

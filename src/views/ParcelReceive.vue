@@ -16,11 +16,11 @@
           <h5 class="text-muted">Empresa</h5>
           <h5 class="text-primary">
             <h1 v-for="hp  in historicP" :key="hp.id">{{hp.amount}}</h1>
-            <b>{{dados.company.name}}</b>
+            <b>{{client.name}}</b>
           </h5>
-          <h5 class="text-muted">Responsável</h5>
+          <h5 class="text-muted">Contato</h5>
           <h5 class="text-primary">
-            <b>{{dados.company.owner_id.name}}</b>
+            <b>{{client.tel}}</b>
           </h5>
         </div>
         <h5 class="border-bottom border-warning pb-2 mt-4 w-50">Dados da parcela</h5>
@@ -132,7 +132,7 @@
                     <b>Valor à receber</b>
                   </label>
                   <b>
-                    <v-text-field solo v-model="receiveValue" type="number" placeholder="R$ 0,00" />
+                    <v-text-field solo v-model="receiveValue" type="text" placeholder="R$ 0,00" value/>
                   </b>
                 </div>
                 <v-btn color="red" block type="submit" @click="Rview = !Rview" class="mt-2">Cancelar</v-btn>
@@ -179,6 +179,7 @@ export default {
     icon: '',
     receive: '',
     remaing: '',
+    client: '',
   }),
   methods: {
     getInstallment() {
@@ -196,6 +197,9 @@ export default {
         // console.log(json)
         // document.getElementById('resp').innerHTML = json
         this.installment = json
+        this.client = json[0].client[0]
+
+
         let array = []
         json.forEach(item => {
           if (item.historic)
@@ -211,11 +215,11 @@ export default {
         switch (status) {
           case 'PENDENTE':
             this.background = "bg-warning",
-              this.icon = "mdi mdi-information-outline text-dark"
+            this.icon = "mdi mdi-information-outline text-dark"
             this.receive = 1
             break;
           case 'COBRADO':
-            this.background = 'bg-danger text-white'
+            this.background = 'bg-charged text-white'
             this.icon = "mdi mdi-close-circle-outline text-white"
             this.receive = 2
             break;
@@ -262,7 +266,7 @@ export default {
           return resp.json()
         }).then(json => {
           // document.getElementById('resp').innerHTML = json
-          // console.log(json.msg)
+          console.log(json)
           this.msg = json.msg
           this.Rview = false
           this.snackbar = true
@@ -291,7 +295,8 @@ export default {
       }).then(resp => {
         return resp.json()
       }).then(json => {
-        console.log(json.msg)
+        // console.log(json.msg)
+         this.msg = json.msg
         this.Nview = false
         this.snackbar = true
         this.getInstallment()
@@ -302,4 +307,8 @@ export default {
 </script>
 
 <style>
+.bg-charged {
+  color: #fff;
+  background-color: #8747ff;
+}
 </style>
