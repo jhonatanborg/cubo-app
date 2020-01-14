@@ -132,7 +132,7 @@
                     <b>Valor à receber</b>
                   </label>
                   <b>
-                    <v-text-field solo v-model="receiveValue" type="text" placeholder="R$ 0,00" value/>
+                    <v-text-field />
                   </b>
                 </div>
                 <v-btn color="red" block type="submit" @click="Rview = !Rview" class="mt-2">Cancelar</v-btn>
@@ -151,12 +151,18 @@
               {{ msg }}
               <v-btn color="red" text @click="snackbar = false">Fechar</v-btn>
             </v-snackbar>
+              <v-snackbar v-model="errorCaixa" :multi-line="multiLine">
+              Por favor, abra o caixa para completar essa operação
+              <v-btn color="red" text @click="snackbar = false">Fechar</v-btn>
+            </v-snackbar>
           </div>
+         
         </div>
       </div>
     </div>
   </v-app>
 </template>
+ 
 <script>
 import vars from '../plugins/env.local'
 export default {
@@ -167,6 +173,8 @@ export default {
     historicP: '',
     multiLine: true,
     snackbar: false,
+        errorCaixa: false,
+
     msg: '',
     Rview: false,
     installment: '',
@@ -215,7 +223,7 @@ export default {
         switch (status) {
           case 'PENDENTE':
             this.background = "bg-warning",
-            this.icon = "mdi mdi-information-outline text-dark"
+              this.icon = "mdi mdi-information-outline text-dark"
             this.receive = 1
             break;
           case 'COBRADO':
@@ -234,48 +242,54 @@ export default {
       })
     },
     sendReceive() {
-      let form = new FormData()
-      let send = false
-      if (parseFloat(this.receiveValue) == parseFloat(this.installment[0].value) || parseFloat(this.receiveValue) == parseFloat(this.remaing)) {
-        form.append('status', 'RECEBIDA')
-        form.append('details', 'Pagamento completo')
-        send = true
-      }
-      if (parseFloat(this.receiveValue) < parseFloat(this.remaing) && parseFloat(this.receiveValue) > 0) {
-        form.append('status', 'COBRADO')
-        form.append('details', 'Pagamento parcial')
-        send = true
-      }
-      let remaing = (this.remaing - this.receiveValue)
-      if (remaing == 0) {
-        form.append('status', 'RECEBIDA')
-        form.append('details', 'Pagamento final')
-      }
-      form.append('remaing', remaing)
-      form.append('user-id', localStorage.getItem('user-id'))
-      form.append('box-id', localStorage.getItem('boxId'))
-      form.append('id', this.$route.params.id)
-      form.append('amount', this.receiveValue)
-      form.append('pay', this.receiveValue)
-      if (send) {
-        const url = `${vars.host}parcelController.php`
-        fetch(url, {
-          method: 'POST',
-          body: form
-        }).then(resp => {
-          return resp.json()
-        }).then(json => {
-          // document.getElementById('resp').innerHTML = json
-          console.log(json)
-          this.msg = json.msg
-          this.Rview = false
-          this.snackbar = true
-          this.getInstallment()
-        })
-      } else {
+      if (localStorage.getItem('boxId') != '' && localStorage.getItem('boxId') != 'null') {
+        let form = new FormData()
+        let send = false
+        if (parseFloat(this.receiveValue) == parseFloat(this.installment[0].value) || parseFloat(this.receiveValue) == parseFloat(this.remaing)) {
+          form.append('status', 'RECEBIDA')
+          form.append('details', 'Pagamento completo')
+          send = true
+        }
+        if (parseFloat(this.receiveValue) < parseFloat(this.remaing) && parseFloat(this.receiveValue) > 0) {
+          form.append('status', 'COBRADO')
+          form.append('details', 'Pagamento parcial')
+          send = true
+        }
+        let remaing = (this.remaing - this.receiveValue)
+        if (remaing == 0) {
+          form.append('status', 'RECEBIDA')
+          form.append('details', 'Pagamento final')
+        }
+        form.append('remaing', remaing)
+        form.append('user-id', localStorage.getItem('user-id'))
+        form.append('box-id', localStorage.getItem('boxId'))
+        form.append('id', this.$route.params.id)
+        form.append('amount', this.receiveValue)
+        form.append('pay', this.receiveValue)
+        if (send) {
+          const url = `${vars.host}parcelController.php`
+          fetch(url, {
+            method: 'POST',
+            body: form
+          }).then(resp => {
+            return resp.json()
+          }).then(json => {
+            // document.getElementById('resp').innerHTML = json
+            console.log(json)
+            this.msg = json.msg
+            this.Rview = false
+            this.snackbar = true
+            this.getInstallment()
+          })
+        } else {
 
-        alert('Valor inválido')
+          alert('Valor inválido')
+        }
+      } else {
+        this.errorCaixa = true
+
       }
+
     },
     sendNoReceive() {
       console.log(this.reasonSelected)
@@ -296,7 +310,7 @@ export default {
         return resp.json()
       }).then(json => {
         // console.log(json.msg)
-         this.msg = json.msg
+        this.msg = json.msg
         this.Nview = false
         this.snackbar = true
         this.getInstallment()
