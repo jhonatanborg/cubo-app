@@ -16,7 +16,7 @@
         <v-list-item
           v-for="client in clients"
           :id="client.id"
-          v-on:click="redirect(client.id)"
+        
           :key="client.id"
           class
 

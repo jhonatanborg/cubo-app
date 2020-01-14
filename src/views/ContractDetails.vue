@@ -14,11 +14,11 @@
         <v-card class="p-2">
           <h5 class="text-muted">Empresa</h5>
           <h5 class="text-primary">
-            <b>{{item.client.name}}</b>
+            <b>{{item.client[0].name}}</b>
           </h5>
           <h5 class="text-muted">Responsável</h5>
           <h5 class="text-primary">
-            <b>{{item.client.name}}</b>
+            <b>{{item.client[0].name}}</b>
           </h5>
         </v-card>
         <div class="card mb-1 p-2 mt-2" :class="background">

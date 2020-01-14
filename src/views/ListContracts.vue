@@ -30,7 +30,7 @@
         <v-list-item-group v-for="contract in listContracts" :key="contract.id">
           <v-list-item tag="router-link" :to="'/contractdetails/' + contract.id" class="text-white">
             <v-list-item-content>
-              <v-list-item-title>{{contract.client.name}}</v-list-item-title>
+              <v-list-item-title>{{contract.client[0].name}}</v-list-item-title>
               <v-list-item-subtitle>{{contract.dateOpen}}</v-list-item-subtitle>
             </v-list-item-content>
             <v-list-item-action>
@@ -40,7 +40,6 @@
             </v-list-item-action>
           </v-list-item>
         </v-list-item-group>
-        <v-divider></v-divider>
       </v-list>
     </div>
   </v-app>

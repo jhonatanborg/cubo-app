@@ -2,7 +2,7 @@
   <v-app>
     <div>
       <v-toolbar class="bg-primary">
-        <v-btn icon dark tag="router-link" to="/companies">
+        <v-btn icon dark tag="router-link" to="/newloan">
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
         <v-toolbar-title class="text-white text-center">Novo Cliente</v-toolbar-title>
