@@ -151,12 +151,11 @@
               {{ msg }}
               <v-btn color="red" text @click="snackbar = false">Fechar</v-btn>
             </v-snackbar>
-              <v-snackbar v-model="errorCaixa" :multi-line="multiLine">
-              Por favor, abra o caixa para completar essa operação
-              <v-btn color="red" text @click="snackbar = false">Fechar</v-btn>
+            <v-snackbar v-model="errorCaixa" color="error">
+              <v-alert type="error">Para completar a operação é necessário abrir o caixa</v-alert>
+              <v-btn text @click="errorCaixa = false">Fechar</v-btn>
             </v-snackbar>
           </div>
-         
         </div>
       </div>
     </div>
@@ -173,7 +172,7 @@ export default {
     historicP: '',
     multiLine: true,
     snackbar: false,
-        errorCaixa: false,
+    errorCaixa: false,
 
     msg: '',
     Rview: false,
