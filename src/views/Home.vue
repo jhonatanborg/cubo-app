@@ -37,7 +37,7 @@
                     color="amber"
                   >
                     <v-list-item-content>
-                      <v-list-item-title>{{installment.client[0].name}}</v-list-item-title>
+                      <v-list-item-title>{{installment.client.name}}</v-list-item-title>
                       <v-list-item-subtitle>13-05-2018</v-list-item-subtitle>
                     </v-list-item-content>
                     <v-list-item-action>
@@ -48,10 +48,9 @@
                   </v-list-item>
                 </v-list-item-group>
               </v-list>
-                <!-- <div id="resp">
+              <!-- <div id="resp">
                   aqui
-                </div> -->
-
+              </div>-->
             </div>
           </v-container>
         </v-sheet>
@@ -311,7 +310,7 @@ export default {
     outputs: 0,
     valueDay: 0,
     totalValue: 0,
-    
+
     items: [{
       title: 'Home',
       icon: 'mdi-view-dashboard',
@@ -348,12 +347,12 @@ export default {
       icon: 'mdi-account-box-outline',
       router: '/listcontracts'
     },
-     {
+    {
       title: 'Relátorio',
       icon: 'mdi-clipboard-outline',
       router: '/report'
     },
-    
+
     ],
     components: [],
     installments: [],
@@ -391,10 +390,11 @@ export default {
       }).then(json => {
         // document.getElementById('resp').innerHTML = json
         this.installments = json
-        console.log(json)
+       console.log(json)
+
       })
     },
-     unsuccessful() {
+    unsuccessful() {
       const url = `${vars.host}parcelController.php`
       let formData = new FormData()
       formData.append('unsuccessful', 'true')

@@ -13,14 +13,14 @@
       <div v-for="dados  in installment" :key="dados.id">
         <h5 class="border-bottom border-warning pb-2 w-50">Dados da empresa</h5>
         <div class="card-n p-2">
-          <h5 class="text-muted">Empresa</h5>
+          <h5 class="text-muted">Cliente</h5>
           <h5 class="text-primary">
             <h1 v-for="hp  in historicP" :key="hp.id">{{hp.amount}}</h1>
-            <b>{{client.name}}</b>
+            <b>{{dados.client.name}}</b>
           </h5>
           <h5 class="text-muted">Contato</h5>
           <h5 class="text-primary">
-            <b>{{client.tel}}</b>
+            <b>{{dados.client.tel}}</b>
           </h5>
         </div>
         <h5 class="border-bottom border-warning pb-2 mt-4 w-50">Dados da parcela</h5>
@@ -132,7 +132,7 @@
                     <b>Valor à receber</b>
                   </label>
                   <b>
-                    <v-text-field />
+                    <v-text-field required solo v-model="receiveValue" />
                   </b>
                 </div>
                 <v-btn color="red" block type="submit" @click="Rview = !Rview" class="mt-2">Cancelar</v-btn>
@@ -201,7 +201,7 @@ export default {
       }).then(resp => {
         return resp.json()
       }).then(json => {
-        // console.log(json)
+        console.log(json[0].client)
         // document.getElementById('resp').innerHTML = json
         this.installment = json
         this.client = json[0].client[0]
@@ -241,6 +241,9 @@ export default {
       })
     },
     sendReceive() {
+
+      console.log(this.installment[0].value, this.receiveValue)
+
       if (localStorage.getItem('boxId') != '' && localStorage.getItem('boxId') != 'null') {
         let form = new FormData()
         let send = false
@@ -281,7 +284,6 @@ export default {
             this.getInstallment()
           })
         } else {
-
           alert('Valor inválido')
         }
       } else {
