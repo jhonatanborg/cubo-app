@@ -9,16 +9,20 @@
     <v-divider></v-divider>
     <v-divider></v-divider>
     <div class="container">
+      <v-snackbar v-model="snackbar">
+        {{ msg }}
+        <v-btn color="red" text @click="snackbar = false">Fechar</v-btn>
+      </v-snackbar>
       <h5 class="border-bottom border-warning pb-2 w-50">Dados da empresa</h5>
       <div v-for="item in contract" :key="item.id">
         <v-card class="p-2">
           <h5 class="text-muted">Empresa</h5>
           <h5 class="text-primary">
-            <b>{{item.client[0].name}}</b>
+            <b>{{item.client.name}}</b>
           </h5>
           <h5 class="text-muted">Responsável</h5>
           <h5 class="text-primary">
-            <b>{{item.client[0].name}}</b>
+            <b>{{item.client.name}}</b>
           </h5>
         </v-card>
         <div class="card mb-1 p-2 mt-2" :class="background">
@@ -103,14 +107,13 @@
   </v-app>
 </template>
 <script>
-import vars from '../plugins/env.local'
-import { log } from 'util'
-const url = `${vars.host}contractController.php`
+import vars from "../plugins/env.local";
+import { log } from "util";
+const url = `${vars.host}contractController.php`;
 
 export default {
-
-  mounted: function () {
-    this.getContract()
+  mounted: function() {
+    this.getContract();
   },
   data: () => ({
     dialog: false,
@@ -121,65 +124,74 @@ export default {
     idContrato: "",
     statusContrato: "",
     background: "",
+    snackbar: false,
+    msg: ""
   }),
   methods: {
     getContract() {
-      let form = new FormData()
-      form.append('get-contract', 'true')
-      form.append('contract-id', this.$route.params.contractid)
+      let form = new FormData();
+      form.append("get-contract", "true");
+      form.append("contract-id", this.$route.params.contractid);
       fetch(url, {
         method: "POST",
         body: form
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        this.installments = json[0].installments
-        this.contract = json
-        this.quantity = this.installments.length
-        this.idContrato = json[0].id
-        this.statusContrato = json[0].status
-        console.log(json[0].id)
-        switch (this.statusContrato) {
-          case "CANCELADO":
-            this.background = "bg-danger"
-            break;
-          case "ABERTO":
-            this.background = "bg-primary"
-            break;
-          default:
-            this.background = "bg-success"
-            break;
-        }
       })
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          this.installments = json[0].installments;
+          this.contract = json;
+          this.quantity = this.installments.length;
+          this.idContrato = json[0].id;
+          this.statusContrato = json[0].status;
+          console.log(json[0].id);
+          switch (this.statusContrato) {
+            case "CANCELADO":
+              this.background = "bg-danger";
+              break;
+            case "ABERTO":
+              this.background = "bg-primary";
+              break;
+            default:
+              this.background = "bg-success";
+              break;
+          }
+        });
     },
     CancelContract() {
-      let form = new FormData()
-      form.append('alter-contract', 'true')
-      form.append('contract-id', this.$route.params.contractid)
-      form.append('contract-status', 'CANCELADO')
+      let form = new FormData();
+      form.append("alter-contract", "true");
+      form.append("contract-id", this.$route.params.contractid);
+      form.append("contract-status", "CANCELADO");
       fetch(url, {
         method: "POST",
         body: form
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        console.log(json)
-
-        switch (this.statusContrato) {
-          case "CANCELADO":
-            this.background = "bg-danger"
-            break;
-          case "ABERTO":
-            this.background = "bg-primary"
-            break;
-          default:
-            this.background = "bg-success"
-            break;
-        }
       })
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          console.log(json);
+          this.CancelView = false
+          this.msg = json.msg;
+          this.snackbar = true;
+          if (json.status) this.statusContrato = json.status;
+          switch (this.statusContrato) {
+            case "CANCELADO":
+              this.background = "bg-danger";
+              break;
+            case "ABERTO":
+              this.background = "bg-primary";
+              break;
+            default:
+              this.background = "bg-success";
+              break;
+          }
+        });
     }
   }
-}
+};
 </script>
 
 <style>

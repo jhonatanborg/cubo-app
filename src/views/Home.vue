@@ -512,7 +512,7 @@ export default {
       }
     },
     verifyBox() {
-      let date = new Date(), mouth = date.getMonth() + 1
+      let date = new Date(), mouth = (date.getMonth() + 1).toString().padStart(2, '0')
       this.datenow = date.getDate() + '/' + mouth + '/' + date.getFullYear()
       this.stateBox = localStorage.getItem('boxStatus')
     },

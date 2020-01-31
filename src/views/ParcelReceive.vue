@@ -18,7 +18,7 @@
             <h1 v-for="hp  in historicP" :key="hp.id">{{hp.amount}}</h1>
             <b>{{dados.client.name}}</b>
           </h5>
-          <h5 class="text-muted">Contato</h5>
+          <h5 class="text-muted">Telefone</h5>
           <h5 class="text-primary">
             <b>{{dados.client.tel}}</b>
           </h5>
@@ -35,7 +35,7 @@
             </div>
             <div class="font-weight-bold">
               <h6>Vencimento</h6>
-              <span class>{{dados.date}}</span>
+              <span v-text="convertDate(dados.date)"></span>
             </div>
           </div>
         </div>
@@ -46,7 +46,7 @@
               <span class="font-weight-bold">Restante</span>
             </span>
             <div>
-              <span class="font-weight-bold">R$ {{remaing}}</span>
+              <span class="font-weight-bold" v-text="convertMoney(remaing)"></span>
             </div>
           </div>
         </div>
@@ -63,10 +63,10 @@
             </div>
             <div>
               <small class="text-primary mr-3">
-                <b>{{item.date}}</b>
+                <b v-text="convertDate(item.date)"></b>
               </small>
               <small class="text-primary">
-                <b>R$ {{item.amount}}</b>
+                <b v-text="convertMoney(item.amount)"></b>
               </small>
             </div>
           </div>
@@ -132,7 +132,7 @@
                     <b>Valor à receber</b>
                   </label>
                   <b>
-                    <v-text-field required solo v-model="receiveValue" />
+                    <v-text-field type="number" required solo v-model="receiveValue" />
                   </b>
                 </div>
                 <v-btn color="red" block type="submit" @click="Rview = !Rview" class="mt-2">Cancelar</v-btn>
@@ -163,162 +163,187 @@
 </template>
  
 <script>
-import vars from '../plugins/env.local'
+import vars from "../plugins/env.local";
 export default {
-  mounted: function () {
-    this.getInstallment()
+  mounted: function() {
+    this.getInstallment();
   },
   data: () => ({
-    historicP: '',
+    historicP: "",
     multiLine: true,
     snackbar: false,
     errorCaixa: false,
 
-    msg: '',
+    msg: "",
     Rview: false,
-    installment: '',
+    installment: "",
     historic: [],
     dialog: false,
     Nview: false,
-    reasonSelected: 'Não recebido',
-    receiveValue: ' ',
-    background: '',
-    icon: '',
-    receive: '',
-    remaing: '',
-    client: '',
+    reasonSelected: "Não recebido",
+    receiveValue: " ",
+    background: "",
+    icon: "",
+    receive: "",
+    remaing: "",
+    client: ""
   }),
   methods: {
     getInstallment() {
-      const url = `${vars.host}parcelController.php`
-      let formData = new FormData()
-      formData.append('parcelinfo', 'true')
-      formData.append('parcel-id', this.$route.params.id)
-      localStorage.setItem('parcel-id', this.$route.params.id)
+      const url = `${vars.host}parcelController.php`;
+      let formData = new FormData();
+      formData.append("parcelinfo", "true");
+      formData.append("parcel-id", this.$route.params.id);
+      localStorage.setItem("parcel-id", this.$route.params.id);
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: formData
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        console.log(json[0].client)
-        // document.getElementById('resp').innerHTML = json
-        this.installment = json
-        this.client = json[0].client[0]
-
-
-        let array = []
-        json.forEach(item => {
-          if (item.historic)
-            array.push(JSON.parse(item.historic))
-        })
-        array.forEach((item, key) => {
-          this.historic = item
-        })
-        let status = (json[0].status)
-        this.remaing = (json[0].remaing)
-
-        // console.log(status)
-        switch (status) {
-          case 'PENDENTE':
-            this.background = "bg-warning",
-              this.icon = "mdi mdi-information-outline text-dark"
-            this.receive = 1
-            break;
-          case 'COBRADO':
-            this.background = 'bg-charged text-white'
-            this.icon = "mdi mdi-close-circle-outline text-white"
-            this.receive = 2
-            break;
-          case 'RECEBIDA':
-            this.background = 'bg-primary text-white'
-            this.icon = "mdi mdi-checkbox-marked-circle-outline text-white"
-            this.receive = 3
-            break;
-          default:
-            break;
-        }
       })
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          console.log(json[0].client);
+          // document.getElementById('resp').innerHTML = json
+          this.installment = json;
+          this.client = json[0].client[0];
+
+          let array = [];
+          json.forEach(item => {
+            if (item.historic) array.push(JSON.parse(item.historic));
+          });
+          array.forEach((item, key) => {
+            this.historic = item;
+          });
+          let status = json[0].status;
+          this.remaing = json[0].remaing;
+
+          // console.log(status)
+          switch (status) {
+            case "PENDENTE":
+              (this.background = "bg-warning"),
+                (this.icon = "mdi mdi-information-outline text-dark");
+              this.receive = 1;
+              break;
+            case "COBRADO":
+              this.background = "bg-charged text-white";
+              this.icon = "mdi mdi-close-circle-outline text-white";
+              this.receive = 2;
+              break;
+            case "RECEBIDA":
+              this.background = "bg-primary text-white";
+              this.icon = "mdi mdi-checkbox-marked-circle-outline text-white";
+              this.receive = 3;
+              break;
+            default:
+              break;
+          }
+        });
     },
     sendReceive() {
+      console.log(this.installment[0].value, this.receiveValue);
 
-      console.log(this.installment[0].value, this.receiveValue)
-
-      if (localStorage.getItem('boxId') != '' && localStorage.getItem('boxId') != 'null') {
-        let form = new FormData()
-        let send = false
-        if (parseFloat(this.receiveValue) == parseFloat(this.installment[0].value) || parseFloat(this.receiveValue) == parseFloat(this.remaing)) {
-          form.append('status', 'RECEBIDA')
-          form.append('details', 'Pagamento completo')
-          send = true
+      if (
+        localStorage.getItem("boxId") != "" &&
+        localStorage.getItem("boxId") != "null"
+      ) {
+        let form = new FormData();
+        let send = false;
+        if (
+          parseFloat(this.receiveValue) ==
+            parseFloat(this.installment[0].value) ||
+          parseFloat(this.receiveValue) == parseFloat(this.remaing)
+        ) {
+          form.append("status", "RECEBIDA");
+          form.append("details", "Pagamento completo");
+          send = true;
         }
-        if (parseFloat(this.receiveValue) < parseFloat(this.remaing) && parseFloat(this.receiveValue) > 0) {
-          form.append('status', 'COBRADO')
-          form.append('details', 'Pagamento parcial')
-          send = true
+        if (
+          parseFloat(this.receiveValue) < parseFloat(this.remaing) &&
+          parseFloat(this.receiveValue) > 0
+        ) {
+          form.append("status", "COBRADO");
+          form.append("details", "Pagamento parcial");
+          send = true;
         }
-        let remaing = (this.remaing - this.receiveValue)
+        let remaing = this.remaing - this.receiveValue;
         if (remaing == 0) {
-          form.append('status', 'RECEBIDA')
-          form.append('details', 'Pagamento final')
+          form.append("status", "RECEBIDA");
+          form.append("details", "Pagamento final");
         }
-        form.append('remaing', remaing)
-        form.append('user-id', localStorage.getItem('user-id'))
-        form.append('box-id', localStorage.getItem('boxId'))
-        form.append('id', this.$route.params.id)
-        form.append('amount', this.receiveValue)
-        form.append('pay', this.receiveValue)
+        form.append("remaing", remaing);
+        form.append("user-id", localStorage.getItem("user-id"));
+        form.append("box-id", localStorage.getItem("boxId"));
+        form.append("id", this.$route.params.id);
+        form.append("amount", this.receiveValue);
+        form.append("pay", this.receiveValue);
         if (send) {
-          const url = `${vars.host}parcelController.php`
+          const url = `${vars.host}parcelController.php`;
           fetch(url, {
-            method: 'POST',
+            method: "POST",
             body: form
-          }).then(resp => {
-            return resp.json()
-          }).then(json => {
-            // document.getElementById('resp').innerHTML = json
-            console.log(json)
-            this.msg = json.msg
-            this.Rview = false
-            this.snackbar = true
-            this.getInstallment()
           })
+            .then(resp => {
+              return resp.json();
+            })
+            .then(json => {
+              // document.getElementById('resp').innerHTML = json
+              console.log(json);
+              this.msg = json.msg;
+              this.Rview = false;
+              this.snackbar = true;
+              this.getInstallment();
+            });
         } else {
-          alert('Valor inválido')
+          this.msg = "Valor inválido";
+          this.snackbar = true;
         }
       } else {
-        this.errorCaixa = true
-
+        this.errorCaixa = true;
       }
-
     },
     sendNoReceive() {
-      console.log(this.reasonSelected)
-      let form = new FormData()
-      form.append('status', 'COBRADO')
-      form.append('details', this.reasonSelected)
-      form.append('remaing', this.remaing)
-      form.append('user-id', localStorage.getItem('user-id'))
-      form.append('box-id', localStorage.getItem('boxId'))
-      form.append('id', this.$route.params.id)
-      form.append('amount', 0)
-      form.append('not-pay', 'true')
-      const url = `${vars.host}parcelController.php`
+      console.log(this.reasonSelected);
+      let form = new FormData();
+      form.append("status", "COBRADO");
+      form.append("details", this.reasonSelected);
+      form.append("remaing", this.remaing);
+      form.append("user-id", localStorage.getItem("user-id"));
+      form.append("box-id", localStorage.getItem("boxId"));
+      form.append("id", this.$route.params.id);
+      form.append("amount", 0);
+      form.append("not-pay", "true");
+      const url = `${vars.host}parcelController.php`;
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: form
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        // console.log(json.msg)
-        this.msg = json.msg
-        this.Nview = false
-        this.snackbar = true
-        this.getInstallment()
       })
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          // console.log(json.msg)
+          this.msg = json.msg;
+          this.Nview = false;
+          this.snackbar = true;
+          this.getInstallment();
+        });
+    },
+    convertMoney(money) {
+      const toCurrency = (n, curr, LanguageFormat = undefined) =>
+        Intl.NumberFormat(LanguageFormat, {
+          style: "currency",
+          currency: curr
+        }).format(n);
+      return toCurrency(money, "BRL");
+    },
+    convertDate(date) {
+      var parts = date.split("-");
+      var mydate = new Date(parts[0], parts[1] - 1, parts[2]);
+      return mydate.toLocaleDateString();
     }
   }
-}
+};
 </script>
 
 <style>

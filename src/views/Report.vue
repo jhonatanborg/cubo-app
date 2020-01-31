@@ -54,7 +54,7 @@
           color="amber"
         >
           <v-list-item-content>
-            <v-list-item-title>{{installment.client[0].name}}</v-list-item-title>
+            <v-list-item-title>{{installment.client.name}}</v-list-item-title>
             <v-list-item-subtitle>{{installment.date}}</v-list-item-subtitle>
           </v-list-item-content>
           <v-list-item-action>
@@ -466,10 +466,6 @@ export default {
       })
         .finally(() => (this.isLoading = false))
     }
-
-
-
-
   },
   watch: {
     model(val) {

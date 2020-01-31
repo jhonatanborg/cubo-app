@@ -12,13 +12,9 @@
       <div class="container mt-2">
         <h5 class="border-bottom border-warning pb-2 w-50">Dados da empresa</h5>
         <v-card class="card-n p-2">
-          <h5 class="text-muted">Empresa</h5>
+          <h5 class="text-muted">Cliente</h5>
           <h5 class="text-primary">
             <b>{{dados.name}}</b>
-          </h5>
-          <h5 class="text-muted">Responsável</h5>
-          <h5 class="text-primary">
-            <b>{{dados.tel}}</b>
           </h5>
         </v-card>
         <v-divider></v-divider>
@@ -78,7 +74,7 @@
           <div class="text-center">
             <v-icon class="display-4" color="primary">mdi-checkbox-marked-circle-outline</v-icon>
           </div>
-          <h5 class="text-center mt-5">Contrato gerado com Sucesso</h5>
+          <h5 class="text-center mt-5">{{msgContract}}</h5>
           <v-btn block color="primary" @click="save()">Concluído</v-btn>
         </v-card>
       </v-dialog>
@@ -86,155 +82,184 @@
   </div>
 </template>
 <script>
-
-import vars from '../plugins/env.local'
+import vars from "../plugins/env.local";
 
 export default {
-  created: function () {
+  created: function() {
     // `this` points to the vm instance
-    this.getPlan()
-    this.getData()
-    this.getInstallments()
-
+    this.getPlan();
+    this.getData();
+    this.getInstallments();
   },
   data: () => ({
     dialog: false,
-    valortotal: '',
-    quantidadeparcela: ' ',
-    valor: ' ',
+    valortotal: "",
+    quantidadeparcela: " ",
+    valor: " ",
     installments: [],
     curdate: [],
-    radios: ' ',
+    radios: " ",
     drawer: null,
-    items: [{
-      title: 'Home',
-      icon: 'mdi-view-dashboard',
-      router: '/home'
-    }, {
-      title: 'Novo Emprestimo',
-      icon: 'mdi-image',
-      router: '/login'
-    }, {
-      title: 'Empresas',
-      icon: 'mdi-help-box',
-      router: '/companies'
-    },],
-    plan: '',
-    dados: '',
+    msgContract: '',
+    items: [
+      {
+        title: "Home",
+        icon: "mdi-view-dashboard",
+        router: "/home"
+      },
+      {
+        title: "Novo Emprestimo",
+        icon: "mdi-image",
+        router: "/login"
+      },
+      {
+        title: "Empresas",
+        icon: "mdi-help-box",
+        router: "/companies"
+      }
+    ],
+    plan: "",
+    dados: "",
 
-    success: '',
+    success: ""
   }),
   methods: {
     save() {
-      this.$router.push('home')
+      this.$router.push("home");
     },
     getInstallments() {
-      this.valortotal = localStorage.getItem('total')
+      this.valortotal = localStorage.getItem("total");
       let today = new Date();
-      let d = today.getDate() + 1
-      let m = today.getMonth()
-      let y = today.getFullYear()
-      let obj = []
-      let verificar = []
-      let curdate = []
-      let number = 1
-      const par = localStorage.getItem('plano')
-      let localplan = localStorage.getItem('radios')
-      let arrayPlan = localplan.split('-', 2);
-      this.valor = arrayPlan[0]
-      this.quantidadeparcela = arrayPlan[1]
+      let d = today.getDate() + 1;
+      let m = today.getMonth();
+      let y = today.getFullYear();
+      let obj = [];
+      let verificar = [];
+      let curdate = [];
+      let number = 1;
+      const par = localStorage.getItem("plano");
+      let localplan = localStorage.getItem("radios");
+      let arrayPlan = localplan.split("-", 2);
+      this.valor = arrayPlan[0];
+      this.quantidadeparcela = arrayPlan[1];
 
-      let cobrar = localStorage.getItem('checkedNames') || ''
+      let cobrar = localStorage.getItem("checkedNames") || "";
       for (let i = 0; i < arrayPlan[1]; i++) {
-        let date = new Date(y, m, d + i)
-        let array
-        let dataStr = date.toString()
-        if (dataStr.indexOf('Sat') < 0) {
-          array = [this.valor, date.toLocaleDateString('pt-br'), number, 'cobrar']
+        let date = new Date(y, m, d + i);
+        let array;
+        let dataStr = date.toString();
+        if (dataStr.indexOf("Sat") < 0) {
+          array = [
+            this.valor,
+            date.toLocaleDateString("pt-br"),
+            number,
+            "cobrar"
+          ];
         }
-        if (dataStr.indexOf('Sun') < 0) {
-          array = [this.valor, date.toLocaleDateString('pt-br'), number, 'cobrar']
+        if (dataStr.indexOf("Sun") < 0) {
+          array = [
+            this.valor,
+            date.toLocaleDateString("pt-br"),
+            number,
+            "cobrar"
+          ];
         }
-        if (cobrar.indexOf('1') < 0 && dataStr.indexOf('Sat') >= 0) {
-          array = [this.valor, date.toLocaleDateString('pt-br'), number, 'não-cobrar']
-          arrayPlan[1]++
-          number--
+        if (cobrar.indexOf("1") < 0 && dataStr.indexOf("Sat") >= 0) {
+          array = [
+            this.valor,
+            date.toLocaleDateString("pt-br"),
+            number,
+            "não-cobrar"
+          ];
+          arrayPlan[1]++;
+          number--;
         }
-        if (cobrar.indexOf('2') < 0 && dataStr.indexOf('Sun') >= 0) {
-          array = [this.valor, date.toLocaleDateString('pt-br'), number, 'não-cobrar']
-          arrayPlan[1]++
-          number--
+        if (cobrar.indexOf("2") < 0 && dataStr.indexOf("Sun") >= 0) {
+          array = [
+            this.valor,
+            date.toLocaleDateString("pt-br"),
+            number,
+            "não-cobrar"
+          ];
+          arrayPlan[1]++;
+          number--;
         }
-        verificar.push(array)
-        if (array[3] === 'cobrar')
-          obj.push(array)
-        number++
+        verificar.push(array);
+        if (array[3] === "cobrar") obj.push(array);
+        number++;
       }
-      console.log(verificar)
+      console.log(verificar);
       // console.log(obj)
       this.installments = obj;
     },
     getPlan() {
-      const url = `${vars.host}planController.php`
-      let formData = new FormData()
-      formData.append('plan', 'true')
-      formData.append('plan-id', this.$route.params.id)
+      const url = `${vars.host}planController.php`;
+      let formData = new FormData();
+      formData.append("plan", "true");
+      formData.append("plan-id", this.$route.params.id);
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: formData
-      }).then(resp => {
-        return resp.json()
-        console.log(json)
-      }).then(json => {
-        json.forEach(item => {
-          this.plan = item
-        })
       })
+        .then(resp => {
+          return resp.json();
+          console.log(json);
+        })
+        .then(json => {
+          json.forEach(item => {
+            this.plan = item;
+          });
+        });
     },
     getData() {
-      if (localStorage.getItem('client-id')) {
-        const url = `${vars.host}clientController.php`
-        let formData = new FormData()
-        formData.append('this-client', 'true')
-        formData.append('client-id', localStorage.getItem('client-id'))
+      if (localStorage.getItem("client-id")) {
+        const url = `${vars.host}clientController.php`;
+        let formData = new FormData();
+        formData.append("this-client", "true");
+        formData.append("client-id", localStorage.getItem("client-id"));
         fetch(url, {
-          method: 'POST',
+          method: "POST",
           body: formData
-        }).then(resp => {
-          return resp.json()
-        }).then(json => {
-          this.dados = json[0]
         })
+          .then(resp => {
+            return resp.json();
+          })
+          .then(json => {
+            this.dados = json[0];
+          });
       } else {
-        this.$router.push('newloan')
+        this.$router.push("newloan");
       }
     },
     confirm() {
-      const url = `${vars.host}contractController.php`
-      let form = new FormData()
-      form.append('confirm', 'true')
-      let json = JSON.stringify(this.installments)
-      form.append('parcelas', json)
-      form.append('plan-id', localStorage.getItem('plan-id'))
-      form.append('client-id', localStorage.getItem('client-id'))
-      form.append('user-id', localStorage.getItem('user-id'))
+      const url = `${vars.host}contractController.php`;
+      let form = new FormData();
+      form.append("confirm", "true");
+      let json = JSON.stringify(this.installments);
+      form.append("parcelas", json);
+      form.append("plan-id", localStorage.getItem("plan-id"));
+      form.append("client-id", localStorage.getItem("client-id"));
+      form.append("user-id", localStorage.getItem("user-id"));
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: form
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        console.log(json)
-        // document.getElementById("respp").innerHTML = json
-        if (json.msg.indexOf('Sucesso') > 0) {
-          this.success = true
-          // alert(json.msg)
-          // this.$router.push('home')
-        }
       })
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          console.log(json);
+          // document.getElementById("respp").innerHTML = json
+          if (json.msg.indexOf("Sucesso") > 0) {
+            this.msgContract = json.msg
+            this.success = true;
+            // alert(json.msg)
+            // this.$router.push('home')
+          }
+        });
     }
-  },
-}
+  }
+};
 </script>
 
 <style>

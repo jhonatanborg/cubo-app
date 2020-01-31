@@ -20,13 +20,15 @@
                 <div class="login p-1 py-4">
                   <div class="mb-5">
                     <label for>Nome completo</label>
-                    <v-text-field solo v-model="client" type="text" name="name" class />
+                    <v-text-field
+                    required
+                     :rules="nameRules"
+                     solo v-model="client" type="text"/>
                   </div>
                   <div class="mt-5">
                     <label for>CPF</label>
-                    <the-mask :mask="['###.###.###-##', '##.###.###/####-##']" />
                     <v-text-field
-                      :mask="['###.###.###-##']"
+                      v-mask="['###.###.###-##']"
                       v-model="cpf"
                       solo
                       type="text"
@@ -36,10 +38,10 @@
                   <div class="mt-2">
                     <label for>Telefone</label>
                     <v-text-field
+                      v-mask="['(##) ####-####', '(##) #####-####']"
                       solo
                       placeholder="Ex: (66) 99999-9999"
                       name="tel"
-                      type="number"
                       v-model="phone"
                     />
                   </div>
@@ -63,15 +65,22 @@
                       </div>
                     </div>
                     <div class="col">
-                      <label>Numero</label>
+                      <label>Número</label>
                       <div id="bloodhound">
-                        <v-text-field v-model="number" value solo id="number" />
+                        <v-text-field type="number" v-model="number" value solo id="number" />
                       </div>
                     </div>
                   </div>
                   <div class>
                     <label for>CEP</label>
-                    <v-text-field solo v-model="cep" id="cep" class aria-describedby="helpId" />
+                    <v-text-field
+                      v-mask="['#####-###']"
+                      solo
+                      v-model="cep"
+                      id="cep"
+                      class
+                      aria-describedby="helpId"
+                    />
                   </div>
 
                   <v-divider></v-divider>
@@ -87,6 +96,10 @@
             </div>
           </v-card>
         </v-tab-item>
+          <v-snackbar v-model="snackbar" >
+              {{ msg }}
+              <v-btn color="red" text @click="snackbar = false">Fechar</v-btn>
+            </v-snackbar>
         <v-tab-item>
           <v-card flat>
             <div class="container">
@@ -105,7 +118,7 @@
                   <div class>
                     <label>CNPJ</label>
                     <v-text-field
-                      :mask="['##.###.###/####-##']"
+                      v-mask="['##.###.###/####-##']"
                       v-model="cnpj"
                       solo
                       placeholder="000 000 000 0000/1"
@@ -113,7 +126,12 @@
                   </div>
                   <div class>
                     <label>Telefone</label>
-                    <v-text-field v-model="phone" solo placeholder="Ex: (66) 99999-9999" />
+                    <v-text-field
+                      v-mask="['(##) ####-####', '(##) #####-####']"
+                      v-model="phone"
+                      solo
+                      placeholder="Ex: (66) 99999-9999"
+                    />
                   </div>
                   <div class>
                     <label>Endereço comercial completo</label>
@@ -135,17 +153,19 @@
                     <div class="col w-20">
                       <label>Número</label>
                       <div id="bloodhound">
-                        <v-text-field v-model="number" solo id="number" aria-describedby="helpId" />
+                        <v-text-field type="number" v-model="number" solo id="number" aria-describedby="helpId" />
                       </div>
                     </div>
                   </div>
                   <div class>
                     <label for>CEP</label>
-                    <v-text-field v-model="cep" solo id="cep" name="cep" />
+                    <v-text-field v-mask="['#####-###']" v-model="cep" solo id="cep" name="cep" />
                   </div>
                   <v-btn class="mt-5" @click="registerCompany()" color="primary" block>Confirmar</v-btn>
                 </div>
+                
               </div>
+            
             </div>
           </v-card>
         </v-tab-item>
@@ -155,14 +175,11 @@
 </template>
 
 <script>
-
-import vars from '../plugins/env.local'
-const url = `${vars.host}clientController.php`
+import vars from "../plugins/env.local";
+const url = `${vars.host}clientController.php`;
 
 export default {
-  mounted: function () {
-
-  },
+  mounted: function() {},
   data: () => ({
     tabs: null,
     owner: "",
@@ -178,74 +195,65 @@ export default {
     district: "",
     number: "",
     cep: "",
+    msg:'',
+    snackbar: false,
+     nameRules: [
+        v => !!v || 'Nome é necessário'
+      ],
   }),
   methods: {
     resgisterClient() {
-      // let type = "fisica"
-      // console.log(this.client)
-      // console.log(this.cpf)
-      // console.log(this.phone)
-      // console.log(this.address)
-      // console.log(this.district)
-      // console.log(this.number)
-      // console.log(this.cep)
-      // console.log(type)
-      let form = new FormData()
-      form.append('register-client', 'true')
-      form.append('street', this.address)
-      form.append('district', this.district)
-      form.append('number', this.number)
-      form.append('cep', this.cep)
-      form.append('name', this.client)
-      form.append('doc', this.cpf)
-      form.append('tel', this.phone)
-      form.append('type', 'Fisíca')
+      let form = new FormData();
+      form.append("register-client", "true");
+      form.append("street", this.address);
+      form.append("district", this.district);
+      form.append("number", this.number);
+      form.append("cep", this.cep);
+      form.append("name", this.client);
+      form.append("doc", this.cpf);
+      form.append("tel", this.phone);
+      form.append("type", "Fisíca");
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: form
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        console.log(json)
       })
-
-
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          console.log(json);
+          this.msg = json.msg
+          this.snackbar = true
+          this.cpf = '', this.address = '', this.district = '', this.number = '', this.cep = '', this.client = '', this.phone = ''
+        });
     },
     registerCompany() {
-      let form = new FormData()
-      form.append('register-client', 'true')
-      form.append('street', this.address)
-      form.append('district', this.district)
-      form.append('number', this.number)
-      form.append('cep', this.cep)
-      form.append('name', this.companyname)
-      form.append('doc', this.cnpj)
-      form.append('tel', this.phone)
-      form.append('type', 'Jurídica')
+      let form = new FormData();
+      form.append("register-client", "true");
+      form.append("street", this.address);
+      form.append("district", this.district);
+      form.append("number", this.number);
+      form.append("cep", this.cep);
+      form.append("name", this.companyname);
+      form.append("doc", this.cnpj);
+      form.append("tel", this.phone);
+      form.append("type", "Jurídica");
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: form
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        console.log(json)
       })
-
-
-      let type = "juridica"
-      console.log(this.companyname)
-      console.log(this.cnpj)
-      console.log(this.phone)
-      console.log(this.address)
-      console.log(this.district)
-      console.log(this.number)
-      console.log(this.cep)
-      console.log(type)
-
-
-    }
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          console.log(json);
+          this.msg = json.msg
+          this.snackbar = true
+          this.cnpj = '', this.address = '', this.district = '', this.number = '', this.cep = '', this.companyname = '', this.phone = ''
+        });
+    },
   }
-}
+};
 </script>
 
 <style>

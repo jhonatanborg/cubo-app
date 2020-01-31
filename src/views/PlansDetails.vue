@@ -14,13 +14,9 @@
     <v-app class="container">
       <h5 class="border-bottom border-warning pb-2 w-50">Confirmar plano</h5>
       <v-card class="card-n p-2">
-        <h5 class="text-muted">Empresa</h5>
+        <h5 class="text-muted">Cliente</h5>
         <h5 class="text-primary">
           <b>{{dados.name}}</b>
-        </h5>
-        <h5 class="text-muted">Responsável</h5>
-        <h5 class="text-primary">
-          <b>{{dados.tel}}</b>
         </h5>
       </v-card>
       <div class="card mb-1 p-2 mt-2 bg-primary">

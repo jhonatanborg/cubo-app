@@ -20,57 +20,55 @@
         <v-btn block class="primary mt-2" @click="openExit()">Confirmar</v-btn>
       </div>
     </div>
-     <v-dialog persistent v-model="success" max-width="300px">
-        <v-card class="container">
-          <div class="text-center">
-            <v-icon class='display-4' color="primary">mdi-checkbox-marked-circle-outline</v-icon>
-          </div>
-          <h5 class="text-center mt-5 ">Entrada realizada com sucesso</h5>
-          <v-btn block color="primary" @click="success = false">Concluído</v-btn>
-        </v-card>
-      </v-dialog>
+    <v-snackbar v-model="snackbar">
+      {{ msgSaida }}
+      <v-btn color="red" text @click="snackbar = false">Fechar</v-btn>
+    </v-snackbar>
   </v-app>
 </template>
 <script>
+import vars from "../plugins/env.local";
 
-import vars from '../plugins/env.local'
-
-const url = `${vars.host}cashflowController.php`
+const url = `${vars.host}cashflowController.php`;
 
 export default {
   data: () => ({
-    select: ['Almoço', 'Lanche', 'Combustivel', 'Vale', 'Outros'],
+    select: ["Almoço", "Lanche", "Combustivel", "Vale", "Outros"],
     valueExit: null,
     reasonExit: null,
-    success:false,
+    msgSaida: "",
+    snackbar: false
   }),
   methods: {
     openExit() {
-      console.log(this.valueExit)
-      console.log(this.reasonExit)
-      let form = new FormData()
-      form.append('add-cashflow', 'true')
-      form.append('value', this.valueExit)
-      form.append('reason', this.reasonExit)
-      form.append('type', 'SAIDA')
-      form.append('user-id', localStorage.getItem('user-id'))
-      form.append('box-id', localStorage.getItem('boxId'))
-      fetch(url, {
-        method: "POST",
-        body: form
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        // let json = JSON.parse(obj)
-        console.log(json)
-       this.success = true
-
-
-        // document.getElementById('resp').innerHTML = json
-      })
+      if (this.valueExit > 0) {
+        let form = new FormData();
+        form.append("add-cashflow", "true");
+        form.append("value", this.valueExit);
+        form.append("reason", this.reasonExit);
+        form.append("type", "SAIDA");
+        form.append("user-id", localStorage.getItem("user-id"));
+        form.append("box-id", localStorage.getItem("boxId"));
+        fetch(url, {
+          method: "POST",
+          body: form
+        })
+          .then(resp => {
+            return resp.json();
+          })
+          .then(json => {
+            this.valueExit = ''
+            console.log(json);
+            this.msgSaida = json.msg;
+            this.snackbar = true;
+          });
+      } else {
+        this.msgSaida = "Valor inválido";
+        this.snackbar = true;
+      }
     }
   }
-}
+};
 </script>
 
 <style>
