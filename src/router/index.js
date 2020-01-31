@@ -2,6 +2,10 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../views/Login.vue'
 
+import VueTheMask from 'vue-the-mask'
+
+Vue.use(VueTheMask)
+
 Vue.use(VueRouter)
 
 const routes = [

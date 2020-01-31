@@ -19,19 +19,25 @@
               <div class>
                 <div class="login p-1 py-4">
                   <div class="mb-5">
-                    <label for>Cliente</label>
+                    <label for>Nome completo</label>
                     <v-text-field solo v-model="client" type="text" name="name" class />
                   </div>
                   <div class="mt-5">
                     <label for>CPF</label>
-                    <v-text-field v-model="cpf" solo type="text" name="cpf" />
+                    <the-mask :mask="['###.###.###-##', '##.###.###/####-##']" />
+                    <v-text-field
+                      :mask="['###.###.###-##']"
+                      v-model="cpf"
+                      solo
+                      type="text"
+                      name="cpf"
+                    />
                   </div>
                   <div class="mt-2">
                     <label for>Telefone</label>
                     <v-text-field
                       solo
                       placeholder="Ex: (66) 99999-9999"
-                      
                       name="tel"
                       type="number"
                       v-model="phone"
@@ -98,11 +104,16 @@
                   </div>
                   <div class>
                     <label>CNPJ</label>
-                    <v-text-field v-model="cnpj" solo placeholder="000 000 000 0000/1"  />
+                    <v-text-field
+                      :mask="['##.###.###/####-##']"
+                      v-model="cnpj"
+                      solo
+                      placeholder="000 000 000 0000/1"
+                    />
                   </div>
                   <div class>
                     <label>Telefone</label>
-                    <v-text-field v-model="phone" solo placeholder="Ex: (66) 99999-9999"  />
+                    <v-text-field v-model="phone" solo placeholder="Ex: (66) 99999-9999" />
                   </div>
                   <div class>
                     <label>Endereço comercial completo</label>
@@ -179,7 +190,7 @@ export default {
       // console.log(this.number)
       // console.log(this.cep)
       // console.log(type)
-     let form = new FormData()
+      let form = new FormData()
       form.append('register-client', 'true')
       form.append('street', this.address)
       form.append('district', this.district)
