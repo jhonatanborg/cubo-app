@@ -87,7 +87,7 @@
                   </span>
                   <div>
                     <span class="font-weight-bold mr-2 text-primary">Data:</span>
-                    <span class="font-weight-bold text-primary">{{datenow}}</span>
+                    <span class="font-weight-bold text-primary"> {{datenow}} </span>
                   </div>
                 </div>
               </div>
@@ -140,7 +140,7 @@
                     <span class="font-weight-bold">Saldo anterior</span>
                   </span>
                   <div>
-                    <span class="font-weight-bold">R$ {{oldValue}}</span>
+                    <span v-text="convertMoney(oldValue)" class="font-weight-bold"></span>
                   </div>
                 </div>
               </div>
@@ -155,7 +155,7 @@
                       <span class="font-weight-bold">Recebimentos</span>
                     </span>
                     <div>
-                      <span class="font-weight-bold">R$ {{receiveds}}</span>
+                      <span v-text="convertMoney(receiveds)" class="font-weight-bold"></span>
                     </div>
                   </div>
                 </div>
@@ -165,7 +165,7 @@
                       <span class="font-weight-bold">Outras entradas</span>
                     </span>
                     <div>
-                      <span class="font-weight-bold">R$ {{inputs}}</span>
+                      <span v-text="convertMoney(inputs)" class="font-weight-bold"></span>
                     </div>
                   </div>
                 </div>
@@ -175,7 +175,7 @@
                       <span class="font-weight-bold">Outras saídas</span>
                     </span>
                     <div>
-                      <span class="font-weight-bold">R$ {{outputs}}</span>
+                      <span v-text="convertMoney(outputs)" class="font-weight-bold"></span>
                     </div>
                   </div>
                 </div>
@@ -187,7 +187,7 @@
                       <span class="font-weight-bold">Saldo Total</span>
                     </span>
                     <div>
-                      <span class="font-weight-bold">R$ {{totalValue}}</span>
+                      <span v-text="convertMoney(totalValue)" class="font-weight-bold"></span>
                     </div>
                   </div>
                 </div>
@@ -274,36 +274,35 @@
   </v-app>
 </template>
 <script>
-import vars from '../plugins/env.local'
+import vars from "../plugins/env.local";
 
 export default {
-  mounted: function () {
+  mounted: function() {
     // `this` points to the vm instance
-    this.installmentsPendents()
-    this.verifyBox()
-    this.getBoxValues()
-    this.levelVerify()
-    this.unsuccessful()
-
+    this.installmentsPendents();
+    this.verifyBox();
+    this.getBoxValues();
+    this.levelVerify();
+    this.unsuccessful();
   },
-  updated: function () {
-    this.verifyBox()
-    this.levelVerify()
+  updated: function() {
+    this.verifyBox();
+    this.levelVerify();
   },
   data: () => ({
-    search: '',
-    selectRouter: '',
-    valueBoxOpen: '',
-    username: localStorage.getItem('user-name'),
-    datenow: '',
-    select: ['Sinop', 'Sorriso', 'Santa Carmem', 'Claudia'],
+    search: "",
+    selectRouter: "",
+    valueBoxOpen: "",
+    username: localStorage.getItem("user-name"),
+    datenow: "",
+    select: ["Sinop", "Sorriso", "Santa Carmem", "Claudia"],
     dialog: false,
     dialogCloseBox: false,
     activeBtn: 1,
     bottomNav: null,
     drawer: null,
-    stateBox: ' ',
-    nameUser: '',
+    stateBox: " ",
+    nameUser: "",
     oldValue: 0,
     receiveds: 0,
     inputs: 0,
@@ -311,229 +310,261 @@ export default {
     valueDay: 0,
     totalValue: 0,
 
-    items: [{
-      title: 'Home',
-      icon: 'mdi-view-dashboard',
-      router: '/home'
-    }, {
-      title: 'Novo Emprestimo',
-      icon: 'mdi mdi-tab-plus',
-      router: '/newloan'
-    }, {
-      title: 'Clientes',
-      icon: 'mdi-account-multiple',
-      router: '/clients'
-    }, {
-      title: 'Entrada',
-      icon: 'mdi-code-greater-than',
-      router: '/inputs'
-    }, {
-      title: 'Saída',
-      icon: 'mdi-code-less-than',
-      router: '/exits'
-    },],
+    items: [
+      {
+        title: "Home",
+        icon: "mdi-view-dashboard",
+        router: "/home"
+      },
+      {
+        title: "Novo Emprestimo",
+        icon: "mdi mdi-tab-plus",
+        router: "/newloan"
+      },
+      {
+        title: "Clientes",
+        icon: "mdi-account-multiple",
+        router: "/clients"
+      },
+      {
+        title: "Entrada",
+        icon: "mdi-code-greater-than",
+        router: "/inputs"
+      },
+      {
+        title: "Saída",
+        icon: "mdi-code-less-than",
+        router: "/exits"
+      }
+    ],
 
-    itemsAdm: [{
-      title: 'Caixas',
-      icon: 'mdi-animation',
-      router: '/boxlist'
-    }, {
-      title: 'Usuários',
-      icon: 'mdi-account-box-outline',
-      router: '/users'
-    },
-    {
-      title: 'Contratos',
-      icon: 'mdi-account-box-outline',
-      router: '/listcontracts'
-    },
-    {
-      title: 'Relátorio',
-      icon: 'mdi-clipboard-outline',
-      router: '/report'
-    },
-
+    itemsAdm: [
+      {
+        title: "Caixas",
+        icon: "mdi-animation",
+        router: "/boxlist"
+      },
+      {
+        title: "Usuários",
+        icon: "mdi-account-box-outline",
+        router: "/users"
+      },
+      {
+        title: "Contratos",
+        icon: "mdi-account-box-outline",
+        router: "/listcontracts"
+      },
+      {
+        title: "Relátorio",
+        icon: "mdi-clipboard-outline",
+        router: "/report"
+      }
     ],
     components: [],
     installments: [],
     a: true,
     state: "fixed-top",
-    levelAdm: false,
+    levelAdm: false
   }),
 
   computed: {
-    searchBussines: function () {
-      let bussinesArray = this.installments
-      let search = this.search
+    searchBussines: function() {
+      let bussinesArray = this.installments;
+      let search = this.search;
       if (!search) {
-        return bussinesArray
+        return bussinesArray;
       }
-      search = search.trim().toLowerCase()
-      bussinesArray = bussinesArray.filter(function (item) {
-        return item
-      })
-      return bussinesArray
-      console.log(bussinesArray)
+      search = search.trim().toLowerCase();
+      bussinesArray = bussinesArray.filter(function(item) {
+        return item;
+      });
+      return bussinesArray;
+      console.log(bussinesArray);
     }
   },
   methods: {
-
     installmentsPendents() {
-      const url = `${vars.host}parcelController.php`
-      let formData = new FormData()
-      formData.append('pendents-installments', 'true')
+      const url = `${vars.host}parcelController.php`;
+      let formData = new FormData();
+      formData.append("pendents-installments", "true");
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: formData
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        // document.getElementById('resp').innerHTML = json
-        this.installments = json
-       console.log(json)
-
       })
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          // document.getElementById('resp').innerHTML = json
+          this.installments = json;
+          console.log(json);
+        });
     },
     unsuccessful() {
-      const url = `${vars.host}parcelController.php`
-      let formData = new FormData()
-      formData.append('unsuccessful', 'true')
+      const url = `${vars.host}parcelController.php`;
+      let formData = new FormData();
+      formData.append("unsuccessful", "true");
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: formData
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        console.log(json)
       })
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          console.log(json);
+        });
     },
     installmentsReceiveds() {
-      const url = `${vars.host}parcelController.php`
-      let formData = new FormData()
-      formData.append('receiveds-installments', 'true')
+      const url = `${vars.host}parcelController.php`;
+      let formData = new FormData();
+      formData.append("receiveds-installments", "true");
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: formData
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        // console.log(json)
-        this.installments = json
       })
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          // console.log(json)
+          this.installments = json;
+        });
     },
     installmentsCharged() {
-      const url = `${vars.host}parcelController.php`
-      let formData = new FormData()
-      formData.append('charged-installments', 'true')
+      const url = `${vars.host}parcelController.php`;
+      let formData = new FormData();
+      formData.append("charged-installments", "true");
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: formData
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        this.installments = json
       })
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          this.installments = json;
+        });
     },
     openBox() {
-      localStorage.setItem('boxStatus', this.stateBox)
-      const url = `${vars.host}boxController.php`
-      let formData = new FormData()
-      formData.append('open-box', 'true')
-      formData.append('value', this.valueBoxOpen)
-      formData.append('route', this.selectRouter)
-      formData.append('user-id', localStorage.getItem('user-id'))
+      localStorage.setItem("boxStatus", this.stateBox);
+      const url = `${vars.host}boxController.php`;
+      let formData = new FormData();
+      formData.append("open-box", "true");
+      formData.append("value", this.valueBoxOpen);
+      formData.append("route", this.selectRouter);
+      formData.append("user-id", localStorage.getItem("user-id"));
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: formData
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        // console.log(json)
-        if (json.boxInfo) {
-          localStorage.setItem('boxStatus', 'ABERTO')
-          localStorage.setItem('boxId', json.boxInfo.boxId)
-        } else {
-          localStorage.setItem('boxStatus', json.statusBox)
-          localStorage.setItem('boxId', json.boxId)
-        }
-        this.inputs = 0
-        this.outputs = 0
-        this.receiveds = 0
-        this.totalValue = this.valueBoxOpen
-        this.oldValue = this.valueBoxOpen
-        this.dialog = false
       })
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          // console.log(json)
+          if (json.boxInfo) {
+            localStorage.setItem("boxStatus", "ABERTO");
+            localStorage.setItem("boxId", json.boxInfo.boxId);
+          } else {
+            localStorage.setItem("boxStatus", json.statusBox);
+            localStorage.setItem("boxId", json.boxId);
+          }
+          this.inputs = 0;
+          this.outputs = 0;
+          this.receiveds = 0;
+          this.totalValue = this.valueBoxOpen;
+          this.oldValue = this.valueBoxOpen;
+          this.dialog = false;
+        });
     },
     closeBox() {
-      localStorage.setItem('boxStatus', this.stateBox)
-      const url = `${vars.host}boxController.php`
-      let formData = new FormData()
-      formData.append('close-box', 'true')
-      formData.append('value-final', this.totalValue)
-      formData.append('box-id', localStorage.getItem('boxId'))
-      formData.append('user-id', localStorage.getItem('user-id'))
+      localStorage.setItem("boxStatus", this.stateBox);
+      const url = `${vars.host}boxController.php`;
+      let formData = new FormData();
+      formData.append("close-box", "true");
+      formData.append("value-final", this.totalValue);
+      formData.append("box-id", localStorage.getItem("boxId"));
+      formData.append("user-id", localStorage.getItem("user-id"));
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: formData
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        // document.getElementById('resp').innerHTML = json
-        localStorage.setItem('boxStatus', 'FECHADO')
-        localStorage.setItem('boxId', null)
-        // console.log(json)
-        this.dialogCloseBox = false
       })
-
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          // document.getElementById('resp').innerHTML = json
+          localStorage.setItem("boxStatus", "FECHADO");
+          localStorage.setItem("boxId", null);
+          // console.log(json)
+          this.dialogCloseBox = false;
+        });
     },
     getBoxValues() {
-      localStorage.setItem('boxStatus', this.stateBox)
-      if (this.stateBox == 'ABERTO') {
-        const url = `${vars.host}boxController.php`
-        let formData = new FormData()
-        formData.append('get-box-values', 'true')
-        formData.append('box-id', localStorage.getItem('boxId'))
-        formData.append('user-id', localStorage.getItem('user-id'))
+      localStorage.setItem("boxStatus", this.stateBox);
+      if (this.stateBox == "ABERTO") {
+        const url = `${vars.host}boxController.php`;
+        let formData = new FormData();
+        formData.append("get-box-values", "true");
+        formData.append("box-id", localStorage.getItem("boxId"));
+        formData.append("user-id", localStorage.getItem("user-id"));
         fetch(url, {
-          method: 'POST',
+          method: "POST",
           body: formData
-        }).then(resp => {
-          return resp.json()
-        }).then(json => {
-          // document.getElementById('resp').innerHTML = json
-          this.inputs = json.inputs
-          this.outputs = json.outputs
-          this.receiveds = json.receiveds
-          this.totalValue = json.valueTotal
-          this.oldValue = json.boxInfo[0].openValue
-          // console.log(json)
-          this.dialogCloseBox = false
         })
+          .then(resp => {
+            return resp.json();
+          })
+          .then(json => {
+            // document.getElementById('resp').innerHTML = json
+            this.inputs = json.inputs;
+            this.outputs = json.outputs;
+            this.receiveds = json.receiveds;
+            this.totalValue = json.valueTotal;
+            this.oldValue = json.boxInfo[0].openValue;
+            // console.log(json)
+            this.dialogCloseBox = false;
+          });
       }
     },
     verifyBox() {
-      let date = new Date(), mouth = (date.getMonth() + 1).toString().padStart(2, '0')
-      this.datenow = date.getDate() + '/' + mouth + '/' + date.getFullYear()
-      this.stateBox = localStorage.getItem('boxStatus')
+      let date = new Date(),
+        mouth = (date.getMonth() + 1).toString().padStart(2, "0");
+      this.datenow = date.getDate() + "/" + mouth + "/" + date.getFullYear();
+      this.stateBox = localStorage.getItem("boxStatus");
     },
     userVerify() {
-      this.nameUser = localStorage.getItem('user-name')
+      this.nameUser = localStorage.getItem("user-name");
     },
     levelVerify() {
-      let levelAdm = localStorage.getItem('level')
+      let levelAdm = localStorage.getItem("level");
       // console.log(levelAdm)
       if (levelAdm === "Administrador") {
-        this.levelAdm = true
+        this.levelAdm = true;
       } else {
-        this.levelAdm = false
+        this.levelAdm = false;
       }
     },
     logout() {
-      localStorage.clear()
-      this.$router.push('/')
+      localStorage.clear();
+      this.$router.push("/");
     },
-  },
-}
+    convertMoney(money) {
+      const toCurrency = (n, curr, LanguageFormat = undefined) =>
+        Intl.NumberFormat(LanguageFormat, {
+          style: "currency",
+          currency: curr
+        }).format(n);
+      return toCurrency(money, "BRL");
+    },
+    convertDate(date) {
+      var parts = date.split("-");
+      var mydate = new Date(parts[0], parts[1] - 1, parts[2]);
+      return mydate.toLocaleDateString();
+    }
+  }
+};
 </script>
 
 <style>

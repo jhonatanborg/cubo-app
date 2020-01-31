@@ -24,6 +24,7 @@
             <div class>
               <label>Telefone</label>
               <v-text-field
+                v-mask="['(##) ####-####', '(##) #####-####']"
                 v-model="clientDetails.tel"
                 solo
                 placeholder="Ex: (66) 99999-9999"
@@ -36,6 +37,7 @@
                 <v-btn right @click="editType()" color="secondary">Alterar</v-btn>
               </div>
               <v-text-field
+                v-mask="['###.###.###-##', '##.###.###/####-##']"
                 v-model="clientDetails.doc"
                 solo
                 placeholder="Ex: (66) 99999-9999"
@@ -125,6 +127,7 @@
                 <label>Numero</label>
                 <div id="bloodhound">
                   <v-text-field
+                    type="number"
                     solo
                     v-model="clientAdress.number"
                     id="number"
@@ -135,110 +138,97 @@
             </div>
             <div class>
               <label for>CEP</label>
-              <v-text-field solo v-model="clientAdress.cep" id="cep" name="cep" />
+              <v-text-field
+                v-mask="['#####-###']"
+                solo
+                v-model="clientAdress.cep"
+                id="cep"
+                name="cep"
+              />
             </div>
             <v-btn class="mt-5" @click="editConfirm()" color="primary" block>Confirmar</v-btn>
           </div>
         </div>
+        <v-snackbar v-model="alterData">
+          {{msgAlterData}}
+          <v-btn color="red" text @click="alterData = false">Fechar</v-btn>
+        </v-snackbar>
       </div>
     </div>
   </v-app>
 </template>
 <script>
-import vars from '../plugins/env.local'
-import { log } from 'util'
-const url = `${vars.host}parcelController.php`
+import vars from "../plugins/env.local";
+import { log } from "util";
+const url = `${vars.host}parcelController.php`;
 
 export default {
-  mounted: function () {
-    this.getClient()
+  mounted: function() {
+    this.getClient();
   },
   data: () => ({
+    msgAlterData: "",
+    alterData: false,
     clientDetails: "",
     clientAdress: "",
     show1: false,
     clientType: "",
-    stateView: false,
-
-
+    stateView: false
   }),
   methods: {
     getClient() {
-      let form = new FormData()
-      form.append('this-client', 'true')
-      form.append('client-id', this.$route.params.id)
+      let form = new FormData();
+      form.append("this-client", "true");
+      form.append("client-id", this.$route.params.id);
       fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: form
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-        this.clientDetails = json[0]
-        this.clientAdress = json[0].adress
-        this.clientType = json[0].type
-        console.log(json[0])
       })
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          this.clientDetails = json[0];
+          this.clientAdress = json[0].adress;
+          this.clientType = json[0].type;
+          console.log(json[0]);
+        });
     },
     editConfirm() {
-      let form = new FormData()
-      form.append('edit-client', 'true')
-      form.append('id', this.$route.params.id)
-      form.append('name',  this.clientDetails.name)
-      form.append('tel', this.clientDetails.tel)
-      form.append('doc', this.clientDetails.doc)
-      form.append('status',  this.clientDetails.status)
-      form.append('street',  this.clientAdress.street)
-      form.append('district',  this.clientAdress.district)
-      form.append('number',    this.clientAdress.number)
-      form.append('cep',    this.clientAdress.cep)
-      form.append('type',   this.clientType)
-       fetch(url, {
-        method: 'POST',
+      let form = new FormData();
+      form.append("edit-client", "true");
+      form.append("id", this.$route.params.id);
+      form.append("name", this.clientDetails.name);
+      form.append("tel", this.clientDetails.tel);
+      form.append("doc", this.clientDetails.doc);
+      form.append("status", this.clientDetails.status);
+      form.append("street", this.clientAdress.street);
+      form.append("district", this.clientAdress.district);
+      form.append("number", this.clientAdress.number);
+      form.append("cep", this.clientAdress.cep);
+      form.append("type", this.clientType);
+      fetch(url, {
+        method: "POST",
         body: form
-      }).then(resp => {
-        return resp.json()
-      }).then(json => {
-       console.log(json)
       })
-
-
-      console.log(this.clientDetails.name);
-      console.log(this.clientDetails.tel);
-      console.log(this.clientDetails.doc);
-      console.log(this.clientDetails.status);
-      console.log(this.clientAdress.street);
-      console.log(this.clientAdress.district);
-      console.log(this.clientAdress.number);
-      console.log(this.clientAdress.cep);
-      console.log(this.clientType);
-
-
-
-
-      // fetch(url, {
-      //   method: 'POST',
-      //   body: form
-      // }).then(resp => {
-      //   return resp.json()
-      // }).then(json => {
-      //   this.clientDetails = json[0]
-      //   this.clientAdress = json[0].adress
-      //   this.clientType = json[0].type
-      //   console.log(json[0].adress)
-      // })
-    
+        .then(resp => {
+          return resp.json();
+        })
+        .then(json => {
+          console.log(json);
+          this.msgAlterData = json.msg;
+          this.alterData = true;
+        });
     },
     editType() {
       if (this.clientType === "Física") {
-        return this.clientType = "Júridica"
+        return (this.clientType = "Júridica");
       } else {
-        return this.clientType = "Física"
+        return (this.clientType = "Física");
       }
-
     }
-  },
-
-}
+  }
+};
 </script>
 
 <style>
