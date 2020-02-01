@@ -38,7 +38,7 @@
                   >
                     <v-list-item-content>
                       <v-list-item-title>{{installment.client.name}}</v-list-item-title>
-                      <v-list-item-subtitle>13-05-2018</v-list-item-subtitle>
+                      <v-list-item-subtitle v-text="convertDate(installment.date)"></v-list-item-subtitle>
                     </v-list-item-content>
                     <v-list-item-action>
                       <div :class="installment.status">
@@ -462,19 +462,17 @@ export default {
           return resp.json();
         })
         .then(json => {
-          // console.log(json)
+          console.log('caixaa')
+          console.log(json)
           if (json.boxInfo) {
             localStorage.setItem("boxStatus", "ABERTO");
-            localStorage.setItem("boxId", json.boxInfo.boxId);
+            localStorage.setItem("boxId", json.boxInfo[0].boxId);
           } else {
             localStorage.setItem("boxStatus", json.statusBox);
             localStorage.setItem("boxId", json.boxId);
           }
-          this.inputs = 0;
-          this.outputs = 0;
-          this.receiveds = 0;
-          this.totalValue = this.valueBoxOpen;
-          this.oldValue = this.valueBoxOpen;
+          this.stateBox = json.boxInfo[0].status
+          this.getBoxValues()
           this.dialog = false;
         });
     },
@@ -523,8 +521,8 @@ export default {
             this.receiveds = json.receiveds;
             this.totalValue = json.valueTotal;
             this.oldValue = json.boxInfo[0].openValue;
-            // console.log(json)
             this.dialogCloseBox = false;
+            console.log(json)
           });
       }
     },
